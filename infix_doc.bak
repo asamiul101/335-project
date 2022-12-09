@@ -1,4 +1,4 @@
-;;; Prefix Constructors, Selectors, & Classifiers
+;;; Infix Constructors, Selectors, & Classifiers
 
 
 ;;; CONSTRUCTORS
@@ -9,7 +9,7 @@
 
 ;;; CODE
 (define (make-and e1 e2)
-  (list '^ e1 e2))
+  (list e1 '^ e2))
 
 ;;; --------------------------------------------------------------------------------------------------------------
 
@@ -20,19 +20,19 @@
 
 ;;; CODE
 (define (make-or e1 e2)
-  (list 'v e1 e2))
+  (list e1 'v e2))
 
 ;;; --------------------------------------------------------------------------------------------------------------
 
 ;;; --------------------------------------------------------------------------------------------------------------
 ;;; MAKE-NOT FUNCTION
 ;;; Pre-condition: inputs an expressions representing a proposition
-;;; Post-condition: returns the expression obtained from performing the NOT (~) operator on the inputed expression
+;;; Post-condition: returns the expression obtained from performing the NOT (-) operator on the inputed expression
 
 ;;; CODE
 (define (make-not e)
   (cond ((and (not (symbol? e)) (not? e)) (first-operand e))
-        (else (list '~ e))))
+        (else (list e '-))))
 
 ;;; --------------------------------------------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@
 
 ;;; CODE
 (define (make-imply e1 e2)
-  (list '=> e1 e2))
+  (list e1 '=> e2))
 
 ;;; --------------------------------------------------------------------------------------------------------------
 
@@ -57,7 +57,7 @@
 
 ;;; CODE
 (define (first-operand e)
-  (cadr e))
+  (car e))
 
 ;;; --------------------------------------------------------------------------------------------------------------
 
@@ -80,7 +80,7 @@
 ;;; CODE
 (define (operator e)
   (cond ((symbol? e) '())
-        (else (car e))))
+        (else (cadr e))))
 
 ;;; --------------------------------------------------------------------------------------------------------------
 
@@ -115,7 +115,7 @@
 
 ;;; CODE
 (define (not? e)
-  (eq? (operator e) '~))
+  (eq? (operator e) '-))
 
 ;;; --------------------------------------------------------------------------------------------------------------
 

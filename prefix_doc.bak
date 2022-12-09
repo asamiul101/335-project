@@ -27,12 +27,12 @@
 ;;; --------------------------------------------------------------------------------------------------------------
 ;;; MAKE-NOT FUNCTION
 ;;; Pre-condition: inputs an expressions representing a proposition
-;;; Post-condition: returns the expression obtained from performing the NOT (~) operator on the inputed expression
+;;; Post-condition: returns the expression obtained from performing the NOT (-) operator on the inputed expression
 
 ;;; CODE
 (define (make-not e)
   (cond ((and (not (symbol? e)) (not? e)) (first-operand e))
-        (else (list '~ e))))
+        (else (list '- e))))
 
 ;;; --------------------------------------------------------------------------------------------------------------
 
@@ -115,7 +115,7 @@
 
 ;;; CODE
 (define (not? e)
-  (eq? (operator e) '~))
+  (eq? (operator e) '-))
 
 ;;; --------------------------------------------------------------------------------------------------------------
 
