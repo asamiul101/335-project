@@ -1,6 +1,8 @@
 ;;; Names: Ida Touray & Samiul Ahmed
 ;;; Emails: Itouray000@citymail.cuny.edu, sahmed051@citymail.cuny.edu
 
+
+
 ;;; --------------------------------------------------------------------------------------------------------------
 ;;; PART 1
 
@@ -284,7 +286,7 @@
   (cond ((symbol? e) e)
         ((not (not? e))
          (let ((first-op (first-operand e)) (second-op (second-operand e)))
-           (cond ((and? e) (convert-and (cond ((eq? (check-infix e) #f) (make-and-pre (translator first-op) (translator second-op)))   
+           (cond ((and? e) (convert-and (cond ((eq? (check-infix e) #f) (make-and-pre (translator first-op) (translator second-op)))    ;;; (p ^ q) / ((p ^ q) ^ (q ^ p)) => ~ (~(~ (~p v ~q)) v ~(~ (~q v ~p)))
                                                (else (make-and (translator first-op) (translator second-op))))))
                  ((imply? e) (convert-imply (cond ((eq? (check-infix e) #f) (make-imply-pre (translator first-op) (translator second-op)))
                                                    (else (make-imply (translator first-op) (translator second-op))))))
