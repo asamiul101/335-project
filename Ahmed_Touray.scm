@@ -340,7 +340,7 @@
 ;;; -------------------------------------------------------------------------------------------------------------
 ;;; PART 2.3
 ;;; -------------------------------------------------------------------------------------------------------------
-;;; LOOKUP FUNCTION
+;;; LOOKUP-VALUE FUNCTION
 
 ;;; SPECIFICATION
 ;;; Pre-condition: input a symbol x, and a association list alist
@@ -359,10 +359,10 @@
 ;;; ------------------------------------------
 ;;;                     (alist head ....     )
 
-(define (lookup x alist)
+(define (lookup-value x alist)
   (cond ((eq? (caar alist) x) (cadar alist)) ;; if x is in current pair        ;;;; caar means car on top of car  car(car) ;;; cadar means cdr on top of car (car(cdr)) 
         ((eq? (cdr alist) '()) '())          ;; if x is not in the list
-        (else (lookup x (cdr alist)))))
+        (else (lookup-value x (cdr alist)))))
 
 ;;; PROOF
 ;;; we let original association list to be ALIST, 
@@ -378,10 +378,10 @@
 
 
 ;;; TEST DATA
-(lookup 'x '((x #f) (y #t) (z #f))); => #f
-;;;(lookup 'y '((x #f) (y #t) (z #f))); => #t
-;;;(lookup 'z '((x #f) (y #t) (z #f))); => #f
-;;;(lookup 'w '((x #f) (y #f) (z #f))); => ()
+(lookup-value 'x '((x #f) (y #t) (z #f))); => #f
+;;;(lookup-value 'y '((x #f) (y #t) (z #f))); => #t
+;;;(lookup-value 'z '((x #f) (y #t) (z #f))); => #f
+;;;(lookup-value 'w '((x #f) (y #f) (z #f))); => ()
 
 
 ;;; IMPLY FUNCTION
@@ -409,7 +409,7 @@
 
 ;;; CODE:
 (define (interpretor e alist)
-  (cond ((symbol? e) (lookup e alist))
+  (cond ((symbol? e) (lookup-value e alist))
         ((not (not? e))
          (let ((first-op (first-operand e)) (second-op (second-operand e)))
            (cond ((and? e) (and (interpretor first-op alist) (interpretor second-op alist)))
