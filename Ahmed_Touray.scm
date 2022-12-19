@@ -21,7 +21,7 @@
 ;;; the OR (v) and NOT (~) operators. Similarly, B' is the re-written proposition that is logically equivalent to B,
 ;;; where B' is expressed using only the OR (v) and NOT (~) operators.
 ;;; (A v B) is then logically equivalent to (A' v B') so all we need to do is call a constructor (for example: make-or) that will take A' and
-;;; B' to re-write (A v B).
+;;; B' to re-write (A' v B').
 
 ;;; case 2: P = (A ^ B)
 ;;; (A ^ B) is logically equivalent to (A' ^ B'), where by the IH, A' and B' are re-written propositions that are
@@ -77,20 +77,19 @@
 
 ;;; CODE
 (define (second-operand e)
-  (cond ((eq? (check-infix e) #f) (caddr e))
-        (else (caddr e))))                      
+  (caddr e))                     
 
 ;;; --------------------------------------------------------------------------------------------------------------
 
 ;;; --------------------------------------------------------------------------------------------------------------
 ;;; OPERATOR FUNCTION
-;;; Pre-condition: inputs an expression representing either a AND, OR, IMPLY proposition
+;;; Pre-condition: inputs an expression representing either a AND, OR, IMPLY, NOT proposition
 ;;; Post-condition: returns the operator of the inputed expression
 
 ;;; CODE
 (define (operator e)
-  (cond ((eq? (check-infix e) #f) (car e))
-        (else (cadr e))))
+  (cond ((eq? (check-infix e) #f) (car e)) ;=> (v p q)
+        (else (cadr e))))                  ;=> (p v q)
 
 ;;; --------------------------------------------------------------------------------------------------------------
 
@@ -292,7 +291,7 @@
                  (else (cond ((eq? (check-infix e) #f) (make-or-pre (translator first-op) (translator second-op)))
                              (else (make-or (translator first-op) (translator second-op))))))))
         (else (let ((first-op (first-operand e)))
-                (cond ((eq? (check-infix e) #f) (make-not-pre (translator first-op)))  ;;; ~p
+                (cond ((eq? (check-infix e) #f) (make-not-pre (translator first-op)))  ;;; ~p 
                       (else (make-not (translator first-op))))))))
 
 
@@ -329,10 +328,10 @@
 ;;;         the OR (v) and NOT (~) operators. Similarly, Q' is the re-written proposition that is logically equivalent to Q,
 ;;;         where Q' is expressed using only the OR (v) and NOT (~) operators.
 ;;;         (P v Q) is then logically equivalent to (P' v Q') so all we need to do is call the make-or / make-or-pre constructor
-;;;         (based on the infix and prefix structure) on P' and Q' to re-write (P v Q).
+;;;         (based on the infix and prefix structure) on P' and Q' to re-write (P' v Q').
 
 ;;; case 2: If E = (P ^ Q) where P and Q are  the components of preposition E, then, we check if the operator is AND(^) by using and? function.
-;;;         Now, (P ^ Q) is logically equivalent to (P' ^ Q'), where by the IH, P' and Q' are re-written propositions that are logically equivalent to A and B, respectively, using only OR (v) and NOT (~) operators.
+;;;         Now, (P ^ Q) is logically equivalent to (P' ^ Q'), where by the IH, P' and Q' are re-written propositions that are logically equivalent to P and Q, respectively, using only OR (v) and NOT (~) operators.
 ;;;         Now, all that's needed to be done is to call convert-and function that will convert (P' ^ Q') to the logically equivalent proposition ~(~P' v ~Q').
 
 ;;; case 3: If E = ~P, then, we check if the operator is NOT(~) by using not? function.
@@ -352,38 +351,38 @@
 ;;; LOOKUP-VALUE FUNCTION
 
 ;;; SPECIFICATION
-;;; Pre-condition: input a symbol x, and a association list alist
+;;; Pre-condition: it takes input a symbol x, and a association list alist
 ;;; Post-condition: if x is in the association list, then it will output its value,
 ;;;   if x is not in the  association list, then it will return a null list '()
 
 ;;; DESIGN IDEA
 ;;; iterative procedure
-;;; Check every pair of association list, say current pair = (car alist), for the termination, if x is the first 
-;;; element of current pair, then it will terminate and return the value of second elements of current pair, 
-;;; and if we check through the list, the x does not appear in any pair of the association list
+;;; First, we check every pair of association list, like current pair = (car alist), for the termination. the code will terminate if x is the first 
+;;; element of current pair, and so it returns the value of second elements of current pair,
+;;; It will also terminate if we check through the list, the x does not appear in any pair of the association list
 
 ;;; orignal ALIST
 ;;; ------------------------------------------
-;;; already checked pairs | not checked yet
+;;; already checked | not checked or processed
 ;;; ------------------------------------------
-;;;                     (alist head ....     )
+;;;                      (alist head ....     )
 
 (define (lookup-value x alist)
-  (cond ((eq? (caar alist) x) (cadar alist)) ;; if x is in current pair        ;;;; caar means car on top of car  car(car) ;;; cadar means cdr on top of car (car(cdr)) 
-        ((eq? (cdr alist) '()) '())          ;; if x is not in the list
+  (cond ((eq? (caar alist) x) (cadar alist)) 
+        ((eq? (cdr alist) '()) '())          
         (else (lookup-value x (cdr alist)))))
 
 ;;; PROOF
-;;; we let original association list to be ALIST, 
-;;; guess invariant: x appears in any pair of original ALIST iff x appears in alist
+;;; let original association list to be ALIST, 
+;;; guess invariant: x appears in any pair of original ALIST if and only if x appears in alist
 
 ;;; Strong enough?: when the program start, alist = ALIST, then our GI is true.
-;;; Weak enough?: when the program terminates, as we mentioned in design idea, there are two cases cause the program terminates
+;;; Weak enough?: As we mentioned in design idea, the program terminates for below two reasons.
 ;;;   1. x was found in current head pair of alist, x must appears in the same pair of ALIST, then our GI is true
 ;;;   2. alist contains only an element of a pair and x is not appear in the pair, x is not in the orignal ALIST, our GI is true
-;;; Preservable?: We assume that GI is true before each iterative call, while the program does not terminates, that means x is not in current head pair,
-;;;   and alist does contains at least 2 pairs, then for the next call new alist becomes (cdr alist), then our GI: x appears in any pair of ALIST iff x
-;;;   appears in alist still maintained, since previous head pair does not contains x.
+;;; Preservable?: We assume that GI is true before each iterative call, while the program does not terminates, thus x is not found in current head pair,
+;;;   and alist contains at least 2 pairs, then for the next call new alist becomes (cdr alist), then our GI: x appears in any pair of ALIST if and only if x
+;;;   appears in alist still maintained, as previous head pair does not contain x.
 
 
 ;;; TEST DATA
@@ -397,7 +396,7 @@
 ;;; IMPLY FUNCTION
 
 ;;; SPECIFICATION
-;;; Pre-condition: input 2 boolean value p and q
+;;; Pre-condition: it takes 2 boolean value p and q as inputs
 ;;; Post-condition: returns the boolean value of p implies q
 
 ;;; USE p=>q <=> ~pvq
@@ -444,7 +443,7 @@
 ;;; INDUCTION STEP:
 ;;; Here we will have two cases. They are:
 ;;; case 1. E is a infix/prefix proposition that has two operands P and Q and a operator (AND (^), OR (v), or IMPLY (=>).
-;;;         By the IH, we know the value of P and Q are all true. As all the corrected value of P and Q are true, the value of E will be true based on (operator (value of r) (value of s)) the logic, which is right.
+;;;         By the IH, we know the value of P and Q are all true. As all the corrected value of P and Q are true, the value of E will be true based on (operator (value of p) (value of q)) the logic, which is right.
 ;;; case 2. E is an infix/prfix proposition has only one operand where E is NOT (~). Assume, P is a component of E that E = ~P.
 ;;;         By IH, we know the value of P is true. then the value of E is going to be (not (value of P)) which is right
 
